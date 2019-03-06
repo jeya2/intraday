@@ -1,0 +1,156 @@
+Command to run ch03 exercise
+------------------------------
+python ch03.py /home/jeya/sia/github-archive/2015-03-01-0.json /home/jeya/first-edition/ch03/ghEmployees.txt
+
+Exports for .bashrc
+-------------------------
+# create alias for python3
+alias python=python3
+
+# Add the SPARK instllation path
+export SPARK_HOME="/home/jeya/bin/spark"
+
+# Add the PySpark classes to the Python path:
+export PYTHONPATH=$SPARK_HOME/python/:$PYTHONPATH
+export PYTHONPATH=$SPARK_HOME/python/lib/py4j-0.10.7-src.zip:$PYTHONPATH
+
+# Add the PySpark Worker and Driver classes to the path
+export PYSPARK_PYTHON=/usr/bin/python3.6
+export PYSPARK_DRIVER_PYTHON=/usr/bin/python3.6
+
+To activate bashrc
+-------------------
+source ~/.bashrc
+
+ch03 spark submit command
+-------------------------
+spark-submit --master local[*] --name "Daily GitHub Push Counter" $HOME/Desktop/jeya/Python/python_exercise/sia-ch03/ch03.py "$HOME/sia/github-archive/*.json" "$HOME/first-edition/ch03/ghEmployees.txt" "$HOME/sia/emp-gh-push-output" "json"
+
+Case study - Dashboard
+--------------------------
+Start Kafka: 
+cd /home/jeya/bin/kafka
+bin/zookeeper-server-start.sh config/zookeeper.properties &
+bin/kafka-server-start.sh config/server.properties &
+
+
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic weblogs
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic stats
+
+Python version:
+----------------
+spark-submit --master local[4] --packages org.apache.spark:spark-streaming-kafka_2.11:1.6.3 \
+--name "Log Analyzer" /home/jeya/Desktop/jeya/Python/python_exercise/case-study/StreamingLogAnalyzer.py \
+-brokerList=localhost:9092 \
+-checkpointDir=/home/jeya/sia/checkpoint
+
+Python file version:
+--------------------
+spark-submit --master local[4] --packages org.apache.spark:spark-streaming-kafka_2.11:1.6.3 \
+--name "Log Analyzer" /home/jeya/Desktop/jeya/Python/python_exercise/case-study/StreamingLogAnalyzer_file.py \
+-brokerList=localhost:9092 \
+-checkpointDir=/home/jeya/sia/checkpoint
+
+Python Tweet file version:
+--------------------------
+spark-submit --master local[4] --packages org.apache.spark:spark-streaming-kafka_2.11:1.6.3 \
+--name "Log Analyzer" /home/jeya/Desktop/jeya/Python/python_exercise/case-study/StreamingTweetAnalyzer_file.py \
+-brokerList=localhost:9092 \
+-checkpointDir=/home/jeya/sia/checkpoint
+
+To send the input data to python/tweet file version:
+-----------------------------------------------------
+rm /home/jeya/Desktop/jeya/Python/python_exercise/case-study/infile/indata
+cp /home/jeya/Desktop/jeya/Python/python_exercise/case-study/indata /home/jeya/Desktop/jeya/Python/python_exercise/case-study/infile
+
+rm /home/jeya/Desktop/jeya/Python/python_exercise/case-study/infile/stocks.json
+cp /home/jeya/Desktop/jeya/Python/python_exercise/case-study/stocks.json /home/jeya/Desktop/jeya/Python/python_exercise/case-study/infile
+
+Scala version:
+spark-submit --master local[4] \
+--class org.sia.loganalyzer.StreamingLogAnalyzer \
+/home/jeya/Desktop/jeya/Python/python_exercise/case-study/streaming-log-analyzer.jar \
+-brokerList=localhost:9092 \
+-checkpointDir=/home/jeya/sia/checkpoint
+
+
+
+Finally to start log simulator
+cd /home/jeya/Desktop/jeya/Python/python_exercise/case-study
+./start-simulator.sh -brokerList=localhost:9092
+
+
+To start Liberty Server:
+cd /home/jeya/Desktop/jeya/Liberty/bin
+./server start defaultServer
+./server stop defaultServer
+
+To debug: 
+cd /home/jeya/Desktop/jeya/Python/python_exercise/case-study
+chmod +x consume-messages.sh
+./consume-messages.sh
+./consume-messages-stats.sh
+
+To push the changes to git
+---------------------------
+git config --global user.email "email@example.com"
+
+Ch06 - Streaming exercise
+-----------------------------------
+
+Install kafka-python package
+$ sudo apt-get install python-pip
+$ sudo pip install kafka-python
+
+$spark-submit --master local[4] --packages org.apache.spark:spark-streaming-kafka_2.11:1.6.3
+Inside the prompt, past the complete code...
+
+
+
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic orders
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic metrics
+
+export KAFKA_HOME=/home/jeya/bin/kafka
+export PATH=$KAFKA_HOME/bin:$PATH
+
+
+-------------------------------------------
+Tweets
+-------
+Start Kafka: 
+cd /home/jeya/bin/kafka
+bin/zookeeper-server-start.sh config/zookeeper.properties &
+bin/kafka-server-start.sh config/server.properties &
+
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic mytweets
+
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic stats
+
+To Run TweetCollector:
+------------------------
+pip3 install tweepy
+pip3 install kafka-python
+
+cd /home/jeya/Desktop/jeya/Python/python_exercise/case-study
+python tweetCollector.py 
+
+To run python tweet analyser:
+--------------------------
+spark-submit --master local[4] --packages org.apache.spark:spark-streaming-kafka_2.11:1.6.3 \
+--name "Log Analyzer" /home/jeya/Desktop/jeya/Python/python_exercise/case-study/StreamingTweetAnalyzer.py \
+-brokerList=localhost:9092 \
+-checkpointDir=/home/jeya/sia/checkpoint
+
+To debug: 
+cd /home/jeya/Desktop/jeya/Python/python_exercise/case-study
+chmod +x consume-messages-mytweets.sh
+./consume-messages-mytweets.sh	
+./consume-messages-stats.sh
+
+To start Liberty Server:
+cd /home/jeya/Desktop/jeya/Liberty/bin
+./server start defaultServer
+./server stop defaultServer
+
+
+
