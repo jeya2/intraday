@@ -114,13 +114,18 @@ if __name__ == "__main__":
 
     # data key types for the output map
     SESSION_COUNT = "SESS"
+    MY_TWEETS = "TWEET"
 
     finalSessionCount = sessionCount.map(lambda c: ((long((datetime.now() - zerotime).total_seconds()) * 1000), {SESSION_COUNT: c}))
     finalSessionCount.pprint()
 
+    # Text per second
+    textPerSecond = logsStream.map(lambda t: ((long((datetime.now() - zerotime).total_seconds()) * 1000), {MY_TWEETS: t['text']}))
+    textPerSecond.pprint()
+
     # all the streams are unioned and combined
     # finalStats = finalSessionCount.union(requests).union(errors).union(ads).reduceByKey(lambda m1, m2: dict(m1.items() + m2.items()))
-    finalStats = finalSessionCount.reduceByKey(lambda m1, m2: dict(m1.items() + m2.items()))
+    finalStats = finalSessionCount.union(textPerSecond).reduceByKey(lambda m1, m2: dict(m1.items() + m2.items()))
     finalStats.pprint()
 
     def sendMetrics(itr):
