@@ -119,8 +119,12 @@ if __name__ == "__main__":
     finalSessionCount = sessionCount.map(lambda c: ((long((datetime.now() - zerotime).total_seconds()) * 1000), {SESSION_COUNT: c}))
     finalSessionCount.pprint()
 
+    import sys
+    reload(sys)
+    sys.setdefaultencoding('utf8')
+
     # Text per second
-    textPerSecond = logsStream.map(lambda t: ((long((datetime.now() - zerotime).total_seconds()) * 1000), {MY_TWEETS: t['text']}))
+    textPerSecond = logsStream.map(lambda t: ((long((datetime.now() - zerotime).total_seconds()) * 1000), {MY_TWEETS: t['text'].encode("utf8")}))
     textPerSecond.pprint()
 
     # all the streams are unioned and combined
