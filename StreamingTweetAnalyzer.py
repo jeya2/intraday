@@ -9,7 +9,7 @@ from kafka import KafkaProducer
 import operator
 import json
 from collections import Counter
-from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 import string
 
 
@@ -89,9 +89,9 @@ if __name__ == "__main__":
     kafkaStream = KafkaUtils.createDirectStream(ssc, [logsTopic], kafkaReceiverParams)
 
     # Create Dstrean from infile
-    #kafkaReceiverParams = {"metadata.broker.list": brokerList}
-    #kafkaStream = KafkaUtils.createDirectStream(ssc, [logsTopic], kafkaReceiverParams)
-    #filestream = ssc.textFileStream("/home/jeya/Desktop/jeya/Python/python_exercise/case-study/infile")
+    # kafkaReceiverParams = {"metadata.broker.list": brokerList}
+    # kafkaStream = KafkaUtils.createDirectStream(ssc, [logsTopic], kafkaReceiverParams)
+    # filestream = ssc.textFileStream("/home/jeya/Desktop/jeya/Python/python_exercise/case-study/infile")
     # filestream.pprint()
 
     zerotime = datetime.fromtimestamp(0)
@@ -104,7 +104,7 @@ if __name__ == "__main__":
             print("Wrong line format (%s): " % line)
             return []
 
-    #logsStream = filestream.flatMap(parseLine)
+    # logsStream = filestream.flatMap(parseLine)
     logsStream = kafkaStream.flatMap(parseLine)
     logsStream.pprint()
 
@@ -119,12 +119,17 @@ if __name__ == "__main__":
     finalSessionCount = sessionCount.map(lambda c: ((long((datetime.now() - zerotime).total_seconds()) * 1000), {SESSION_COUNT: c}))
     finalSessionCount.pprint()
 
-    import sys
-    reload(sys)
-    sys.setdefaultencoding('utf8')
+    def preprocess(s):
+        tokens = word_tokenize(s)
+        terms_all = [term.encode("utf-8") for term in tokens]
+        all_tokens = []
+ #       ''.join(term.encode("utf-8"))
+        all_tokens.append(''.join(terms_all))
+        return all_tokens
+        # return terms_allgf
 
     # Text per second
-    textPerSecond = logsStream.map(lambda t: ((long((datetime.now() - zerotime).total_seconds()) * 1000), {MY_TWEETS: t['text'].encode("utf8")}))
+    textPerSecond = logsStream.map(lambda t: ((long((datetime.now() - zerotime).total_seconds()) * 1000), {MY_TWEETS: preprocess(t['text'])}))
     textPerSecond.pprint()
 
     # all the streams are unioned and combined
